@@ -17,7 +17,7 @@ def read_sudoku(path: tp.Union[str, pathlib.Path]) -> tp.List[tp.List[str]]:
 
 def create_grid(puzzle: str) -> tp.List[tp.List[str]]:
     """Создание двумерного списка из строки"""
-    digits = [c for c in puzzle if c in "123456789."]
+    digits = [digits for digits in puzzle if digits in "123456789."]
     grid = group(digits, 9)
     return grid
 
@@ -79,8 +79,13 @@ def get_block(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.List[s
     >>> get_block(grid, (8, 8))
     ['2', '8', '.', '.', '.', '5', '.', '7', '9']
     """
-    y, x = pos[0] // 3, pos[1] // 3
-    return [*grid[y * 3][x * 3 : x * 3 + 3], *grid[y * 3 + 1][x * 3 : x * 3 + 3], *grid[y * 3 + 2][x * 3 : x * 3 + 3]]
+
+    start_col, start_row = pos[1] // 3 * 3, pos[0] // 3 * 3
+    return [
+        *grid[start_row][start_col : start_col + 3],
+        *grid[start_row + 1][start_col : start_col + 3],
+        *grid[start_row + 2][start_col : start_col + 3],
+    ]
 
 
 def find_empty_positions(grid: tp.List[tp.List[str]]) -> tp.Optional[tp.Tuple[int, int]]:
@@ -110,9 +115,9 @@ def find_possible_values(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -
     >>> values == {'2', '5', '9'}
     True
     """
-    set_first = set("123456789")
-    set_second = set(get_block(grid, pos)).union(get_row(grid, pos), get_col(grid, pos))
-    return set_first - set_second
+    all_possible_values = set("123456789")
+    existing_values = set(get_block(grid, pos)).union(get_row(grid, pos), get_col(grid, pos))
+    return all_possible_values - existing_values
 
 
 def solve(grid: tp.List[tp.List[str]]) -> tp.Optional[tp.List[tp.List[str]]]:
