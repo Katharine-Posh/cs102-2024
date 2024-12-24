@@ -1,12 +1,17 @@
+"""Версия игры с графическим интерфейсом"""
+
 from pathlib import Path
 
 import pygame
+import pygame.locals
+
 from life import GameOfLife
-from pygame.locals import *
 from ui import UI
 
 
 class GUI(UI):
+    """Общая логика работы игры с графическим интерфейсом"""
+
     def __init__(self, life: GameOfLife, cell_size: int = 10, speed: int = 5) -> None:
         super().__init__(life)
         self.cell_size = cell_size
@@ -17,29 +22,33 @@ class GUI(UI):
         self.speed = speed
 
     def draw_lines(self) -> None:
+        """Создание линий - клетчатого поля"""
         for x in range(0, self.life.cols * self.cell_size, self.cell_size):
-            pygame.draw.line(self.screen, pygame.Color('black'),
-                             (x, 0), (x, self.life.rows * self.cell_size))
+            pygame.draw.line(self.screen, pygame.Color("black"), (x, 0), (x, self.life.rows * self.cell_size))
         for y in range(0, self.life.rows * self.cell_size, self.cell_size):
-            pygame.draw.line(self.screen, pygame.Color('black'),
-                             (0, y), (self.life.cols * self.cell_size, y))
-        pass
+            pygame.draw.line(self.screen, pygame.Color("black"), (0, y), (self.life.cols * self.cell_size, y))
 
     def draw_grid(self) -> None:
+        """ "Закрашивание" клеток в соответствии с их состоянием (живая или нет)"""
         grid = self.life.curr_generation
 
         for i in range(len(grid)):
             for j in range(len(grid[i])):
                 if grid[i][j] == 1:
-                    pygame.draw.rect(self.screen, pygame.Color("purple"),
-                                     (i * self.cell_size, j * self.cell_size, self.cell_size, self.cell_size))
+                    pygame.draw.rect(
+                        self.screen,
+                        pygame.Color("purple"),
+                        (i * self.cell_size, j * self.cell_size, self.cell_size, self.cell_size),
+                    )
                 else:
-                    pygame.draw.rect(self.screen, pygame.Color("white"),
-                                     (i * self.cell_size, j * self.cell_size, self.cell_size, self.cell_size))
-        pass
+                    pygame.draw.rect(
+                        self.screen,
+                        pygame.Color("white"),
+                        (i * self.cell_size, j * self.cell_size, self.cell_size, self.cell_size),
+                    )
 
     def run(self) -> None:
-        pygame.init()
+        pygame.init()  # pylint: disable=no-member
         clock = pygame.time.Clock()
         pygame.display.set_caption("Game of Life")
         self.screen.fill(pygame.Color("white"))
@@ -53,13 +62,13 @@ class GUI(UI):
 
         while running and has_changes:
             for event in pygame.event.get():
-                if event.type == QUIT:
+                if event.type == pygame.locals.QUIT:  # pylint: disable=no-member
                     running = False
-                if event.type == KEYDOWN:
-                    if event.key == K_SPACE:
+                if event.type == pygame.locals.KEYDOWN:  # pylint: disable=no-member
+                    if event.key == pygame.locals.K_SPACE:  # pylint: disable=no-member
                         paused ^= True
                         print("Pause toggled")
-                if event.type == MOUSEBUTTONDOWN:
+                if event.type == pygame.locals.MOUSEBUTTONDOWN:  # pylint: disable=no-member
                     if event.button == 1 and paused:
                         y, x = event.pos
                         x //= self.cell_size
@@ -83,16 +92,14 @@ class GUI(UI):
 
             pygame.display.flip()
             clock.tick(self.speed)
-        pygame.quit()
+        pygame.quit()  # pylint: disable=no-member
         print("Game Over")
-
-        pass
 
 
 if __name__ == "__main__":
     game = GUI(life=GameOfLife((50, 50)), speed=50, cell_size=15)
     game.run()
-    game.life.save(Path('result.txt'))
+    game.life.save(Path("result.txt"))
 
     # Загрузка из файла
 
@@ -101,4 +108,3 @@ if __name__ == "__main__":
     # for _ in range(4):
     #     game.step()
     # print(game.curr_generation)
-
