@@ -4,7 +4,6 @@ from pathlib import Path
 
 import pygame
 import pygame.locals
-
 from life import GameOfLife
 from ui import UI
 
